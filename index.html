@@ -126,6 +126,11 @@
   .shot-slot.is-current{border-style:solid!important;border-color:rgba(1,202,225,.6)!important;background:white!important;opacity:1!important;width:44px!important;height:44px!important;filter:drop-shadow(0 3px 6px rgba(1,202,225,.12))!important;}
   .shot-add{display:none;position:absolute;inset:0;color:#01cae1;font:400 22px/1 Inter,system-ui;align-items:center;justify-content:center;}
   .shot-slot.is-current .shot-add{display:flex;}
+  .demo-action{display:flex;align-items:center;justify-content:center;gap:8px!important;height:48px!important;min-height:48px;box-sizing:border-box;border-radius:24px!important;color:#111418;}
+  .demo-action-secondary{background:rgba(23,23,26,.04)!important;border:1px solid rgba(23,23,26,.1)!important;}
+  .demo-action-primary{background:#01cae1!important;border:1px solid transparent!important;}
+  .demo-action .action-icon{display:block;width:20px;height:20px;flex-shrink:0;overflow:visible;}
+  .demo-action .action-label{font:600 15px/20px Inter,system-ui;white-space:nowrap;}
   /* CapCut's restrained type hierarchy and cyan-blue flow marker, on the dark demo stage. */
   .panel{position:absolute;right:calc(50% + 240px);top:50%;transform:translateY(-50%);width:240px;font-size:13px;color:#96969f;max-height:86vh;overflow:auto;scrollbar-width:none;}
   .panel h1{font-size:15px;font-weight:600;line-height:22px;margin:0 0 7px;color:#f0f0f4;}
@@ -1653,19 +1658,8 @@
       </div>
       <div class="absolute bg-[#e3e9ef] h-px left-0 top-[157px] w-[402px]" data-node-id="127:1440" data-name="Rectangle"></div>
       <div class="absolute bg-gradient-to-b from-[rgba(246,249,252,0)] h-[120px] left-0 to-[#f6f9fc] bottom-0 z-10 pointer-events-none via-[#f6f9fc] via-[30%] w-[402px]" data-node-id="127:1704" data-name="Bottom fade"></div>
-      <div class="absolute bg-[rgba(23,23,26,0.04)] border border-[rgba(23,23,26,0.1)] border-solid content-stretch flex gap-[6px] h-[48px] items-center justify-center left-[16px] overflow-clip rounded-[24px] bottom-[34px] z-10 w-[181px]" data-node-id="127:1705" data-act="album:overview" data-name="Button · Add footage">
-        <div class="relative shrink-0 size-[16px]" data-node-id="127:1706" data-name="plus">
-          <img alt="" class="absolute block inset-0 max-w-none size-full" src="assets/50d5acbc-4273-4839-883e-15e5ff705572.svg" />
-        </div>
-        <p class="font-semibold leading-[normal] not-italic relative shrink-0 text-[#111418] text-[15px] whitespace-nowrap" data-node-id="127:1709">
-          Add footage
-        </p>
-      </div>
-      <div class="absolute bg-[#01cae1] content-stretch flex h-[48px] items-center justify-center left-[205px] overflow-clip rounded-[24px] bottom-[34px] z-10 w-[181px]" data-node-id="127:1710" data-act="go:process" data-name="Button · AutoCut (CapCut cyan)">
-        <p class="font-bold leading-[normal] not-italic relative shrink-0 text-[16px] text-black whitespace-nowrap" data-node-id="127:1711">
-          AutoCut
-        </p>
-      </div>
+      <div class="demo-action demo-action-secondary absolute bg-[rgba(23,23,26,0.04)] border border-[rgba(23,23,26,0.1)] border-solid content-stretch flex gap-[6px] h-[48px] items-center justify-center left-[16px] overflow-clip rounded-[24px] bottom-[34px] z-10 w-[181px]" data-node-id="127:1705" data-act="album:overview" data-name="Button · Add footage"><svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.25"/><path d="m4 17 5-5 4 4 3-3 4 4"/></svg><span class="action-label">Add footage</span></div>
+      <div class="demo-action demo-action-primary absolute bg-[#01cae1] content-stretch flex h-[48px] items-center justify-center left-[205px] overflow-clip rounded-[24px] bottom-[34px] z-10 w-[181px]" data-node-id="127:1710" data-act="go:process" data-name="Button · AutoCut (CapCut cyan)"><svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="m10 8 5 4-5 4Z" fill="currentColor" stroke="none"/><path d="m19 14-3 5h4l-3 5"/></svg><span class="action-label">AutoCut</span></div>
       <div class="scroller absolute left-0 right-0 top-[158px] bottom-0 overflow-y-auto scroll-hide"><div class="relative content-stretch flex flex-col gap-[12px] items-start ml-[16px] pt-[16px] pb-[130px] w-[370px]" data-node-id="141:4578">
         <div class="h-[208px] overflow-clip relative rounded-[16px] shrink-0 w-full" data-node-id="130:1118" data-name="Preview player · 3:00 · landscape">
           <img alt="" class="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[16px] size-full" src="assets/1131b122-f583-47f9-be4b-e7386ce82eda.webp" />
@@ -2265,22 +2259,8 @@
           </div>
         </div>
         <div class="content-stretch flex gap-[10px] items-start overflow-clip relative shrink-0 w-full" data-node-id="201:1203" data-name="Actions">
-          <div class="bg-[rgba(23,23,26,0.04)] border border-[rgba(23,23,26,0.1)] border-solid content-stretch flex flex-[1_0_0] gap-[6px] h-[48px] items-center justify-center min-w-px overflow-clip relative rounded-[24px]" data-node-id="201:1204" data-act="go:camera" data-name="Button · Shoot (primary)">
-            <div class="relative shrink-0 size-[18px]" data-node-id="201:1206" data-name="video">
-              <img alt="" class="absolute block inset-0 max-w-none size-full" src="assets/d938464b-2b4f-4884-b76e-ec0442662c5c.svg" />
-            </div>
-            <p class="font-semibold leading-[normal] not-italic relative shrink-0 text-[#111418] text-[15px] whitespace-nowrap" data-node-id="201:1205">
-              Shoot
-            </p>
-          </div>
-          <div class="bg-[#01cae1] content-stretch flex flex-[1_0_0] gap-[6px] items-center justify-center min-w-px overflow-clip relative rounded-[24px] self-stretch" data-node-id="156:1184" data-act="go:process" data-name="Button · AutoCut (secondary)">
-            <div class="relative shrink-0 size-[18px]" data-node-id="190:4900" data-name="video">
-              <img alt="" class="absolute block inset-0 max-w-none size-full" src="assets/d938464b-2b4f-4884-b76e-ec0442662c5c.svg" />
-            </div>
-            <p class="font-semibold leading-[normal] not-italic relative shrink-0 text-[#111418] text-[15px] whitespace-nowrap" data-node-id="156:1188">
-              AutoCut
-            </p>
-          </div>
+          <div class="demo-action demo-action-secondary bg-[rgba(23,23,26,0.04)] border border-[rgba(23,23,26,0.1)] border-solid content-stretch flex flex-[1_0_0] gap-[6px] h-[48px] items-center justify-center min-w-px overflow-clip relative rounded-[24px]" data-node-id="201:1204" data-act="go:camera" data-name="Button · Shoot (primary)"><svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L8 6H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3.5"/></svg><span class="action-label">Shoot</span></div>
+          <div class="demo-action demo-action-primary bg-[#01cae1] content-stretch flex flex-[1_0_0] gap-[6px] items-center justify-center min-w-px overflow-clip relative rounded-[24px] self-stretch" data-node-id="156:1184" data-act="go:process" data-name="Button · AutoCut (secondary)"><svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="m10 8 5 4-5 4Z" fill="currentColor" stroke="none"/><path d="m19 14-3 5h4l-3 5"/></svg><span class="action-label">AutoCut</span></div>
         </div>
       </div>
     </div>
@@ -3469,11 +3449,7 @@
                 <img alt="" class="absolute block inset-0 max-w-none size-full" src="assets/09453567-b324-463c-8b12-50aa6643bb1c.svg" />
               </div>
             </div>
-            <div class="bg-[#01cae1] content-stretch flex flex-[1_0_0] h-[43px] items-center justify-center min-w-px overflow-clip relative rounded-[5px]" data-node-id="181:1547" data-act="go:process" data-name="AutoCut">
-              <p class="font-medium leading-[normal] not-italic relative shrink-0 text-[16px] text-white whitespace-nowrap" data-node-id="181:1550">
-                AutoCut
-              </p>
-            </div>
+            <div class="demo-action demo-action-primary bg-[#01cae1] content-stretch flex flex-[1_0_0] h-[43px] items-center justify-center min-w-px overflow-clip relative rounded-[5px]" data-node-id="181:1547" data-act="go:process" data-name="AutoCut"><svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="m10 8 5 4-5 4Z" fill="currentColor" stroke="none"/><path d="m19 14-3 5h4l-3 5"/></svg><span class="action-label">AutoCut</span></div>
           </div>
         </div>
         <div class="absolute bg-[#111418] h-[5px] left-[134px] rounded-[3px] top-[861px] w-[134px]" data-node-id="181:1551" data-name="Home indicator"></div>
