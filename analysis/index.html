@@ -52,7 +52,7 @@
 
 
   /* Hero */
-  .hero{padding:136px 0 88px;
+  .hero{padding:196px 0 88px;
     background:
       radial-gradient(60% 55% at 12% 0%,#eceeff 0%,rgba(236,238,255,0) 70%),
       radial-gradient(55% 50% at 92% 4%,#e6fbff 0%,rgba(230,251,255,0) 70%),
@@ -316,6 +316,10 @@
     .slot.empty img{transition:none;}
     .goal-cards.is-in .goal-icon svg > :is(path,circle,rect,line,polyline){animation:none;}
   }
+/* Top bar: transparent over the hero; frosted only once the page scrolls */
+.topbar,.topbar.is-scrolled{transition:background-color .36s cubic-bezier(.22,1,.36,1),box-shadow .36s cubic-bezier(.22,1,.36,1),backdrop-filter .36s cubic-bezier(.22,1,.36,1),-webkit-backdrop-filter .36s cubic-bezier(.22,1,.36,1);}
+.topbar{margin-bottom:-60px;background:rgba(255,255,255,0)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none;}
+.topbar.is-scrolled{background:rgba(255,255,255,.72)!important;backdrop-filter:saturate(1.6) blur(16px)!important;-webkit-backdrop-filter:saturate(1.6) blur(16px)!important;box-shadow:0 1px 0 rgba(20,25,31,.06);}
 </style>
 </head>
 <body>
@@ -675,6 +679,9 @@ window.addEventListener('load',()=>{
   const run=()=>files.forEach(f=>{const l=document.createElement('link');l.rel='prefetch';l.href='../'+f;l.as=/\.mp4$/.test(f)?'video':'image';document.head.appendChild(l);});
   ('requestIdleCallback' in window)?requestIdleCallback(run,{timeout:3000}):setTimeout(run,1500);
 });
+</script>
+<script>
+(function(){const bar=document.querySelector('.topbar');const update=()=>bar.classList.toggle('is-scrolled',window.scrollY>8);update();window.addEventListener('scroll',update,{passive:true});})();
 </script>
 </body>
 </html>

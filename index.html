@@ -232,6 +232,14 @@
   .intro-pill{position:absolute;display:flex;align-items:center;gap:10px;height:44px;padding:0 9px 0 16.5px;box-sizing:border-box;border-radius:22px;background:#f1f2f4;border:1px solid rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(17,20,24,.04);}
   .intro-pill span{font:500 15px/20px Inter,system-ui;color:#111418;white-space:nowrap;}
   .intro-pill img{width:26px;height:26px;border-radius:7px;object-fit:cover;flex-shrink:0;}
+  .ov-tray{position:absolute;left:0;right:0;bottom:0;z-index:9;height:152px;box-sizing:border-box;padding-top:14px;background:#fff;border:1px solid rgba(255,255,255,.9);border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -4px 24px rgba(94,112,133,.08);}
+  .ov-strip{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding:0 16px;}
+  .ov-strip::-webkit-scrollbar{display:none;}
+  .ov-part{display:flex;gap:8px;flex-shrink:0;}
+  .ov-slot{position:relative;width:44px;height:44px;flex-shrink:0;border-radius:10px;overflow:hidden;box-sizing:border-box;background:rgba(255,255,255,.7);border:1px dashed rgba(162,169,174,.55);}
+  .ov-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
+  .ov-slot.is-filled{border:0;background:#eef1f4;}
+  .ov-slot.is-filled img{display:block;}
   .screen{isolation:isolate;}
   #scr-album2.on [data-name="Dim"],#scr-album3.on [data-name="Dim"]{animation:fadeIn .36s cubic-bezier(.22,1,.36,1);}
   .screen.measuring{display:block!important;visibility:hidden!important;}
@@ -1741,10 +1749,10 @@
         </div>
       </div>
       <div class="absolute bg-[#e3e9ef] h-px left-0 top-[157px] w-[402px]" data-node-id="127:1440" data-name="Rectangle"></div>
-      <div class="absolute bg-gradient-to-b from-[rgba(246,249,252,0)] h-[120px] left-0 to-[#f6f9fc] bottom-0 z-10 pointer-events-none via-[#f6f9fc] via-[30%] w-[402px]" data-node-id="127:1704" data-name="Bottom fade"></div>
+      <div class="ov-tray" data-node-id="ov:tray" data-name="Overview · all shots tray" aria-label="Footage progress"><div class="ov-strip"><div class="ov-part"><div class="ov-slot is-filled" data-shot="1"><img alt="" src="assets/vlog/shot_01.jpg"></div><div class="ov-slot is-filled" data-shot="2"><img alt="" src="assets/vlog/shot_02.jpg"></div></div><div class="ov-part"><div class="ov-slot is-filled" data-shot="3"><img alt="" src="assets/vlog/shot_05.jpg"></div><div class="ov-slot is-filled" data-shot="4"><img alt="" src="assets/vlog/shot_07.jpg"></div><div class="ov-slot is-filled" data-shot="5"><img alt="" src="assets/vlog/shot_06.jpg"></div><div class="ov-slot" data-shot="6"><img alt="" src="assets/vlog/shot_03.jpg"></div><div class="ov-slot" data-shot="7"><img alt="" src="assets/vlog/shot_18.jpg"></div></div><div class="ov-part"><div class="ov-slot" data-shot="8"><img alt="" src="assets/vlog/shot_11.jpg"></div><div class="ov-slot" data-shot="9"><img alt="" src="assets/vlog/shot_14.jpg"></div><div class="ov-slot" data-shot="10"><img alt="" src="assets/vlog/shot_19.jpg"></div><div class="ov-slot" data-shot="11"><img alt="" src="assets/vlog/shot_15.jpg"></div></div><div class="ov-part"><div class="ov-slot" data-shot="12"><img alt="" src="assets/vlog/shot_13.jpg"></div><div class="ov-slot" data-shot="13"><img alt="" src="assets/vlog/shot_17.jpg"></div><div class="ov-slot" data-shot="14"><img alt="" src="assets/vlog/shot_04.jpg"></div><div class="ov-slot" data-shot="15"><img alt="" src="assets/vlog/shot_22.jpg"></div><div class="ov-slot" data-shot="16"><img alt="" src="assets/vlog/shot_23.jpg"></div></div><div class="ov-part"><div class="ov-slot" data-shot="17"><img alt="" src="assets/vlog/shot_25.jpg"></div><div class="ov-slot" data-shot="18"><img alt="" src="assets/vlog/shot_26.jpg"></div></div><div class="ov-part"><div class="ov-slot" data-shot="19"><img alt="" src="assets/vlog/shot_32.jpg"></div></div></div></div>
       <div class="demo-action demo-action-secondary absolute bg-[rgba(23,23,26,0.04)] border border-[rgba(23,23,26,0.1)] border-solid content-stretch flex gap-[6px] h-[48px] items-center justify-center left-[16px] overflow-clip rounded-[24px] bottom-[34px] z-10 w-[181px]" data-node-id="127:1705" data-act="album:overview" data-name="Button · Add footage"><svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="action-label">Add footage</span></div>
       <div class="demo-action demo-action-primary absolute bg-[#01cae1] content-stretch flex h-[48px] items-center justify-center left-[205px] overflow-clip rounded-[24px] bottom-[34px] z-10 w-[181px]" data-node-id="127:1710" data-act="go:process" data-name="Button · AutoCut (CapCut cyan)"><svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="m10 8 5 4-5 4Z" fill="currentColor" stroke="none"/><path d="m19 14-3 5h4l-3 5"/></svg><span class="action-label">AutoCut</span></div>
-      <div class="scroller absolute left-0 right-0 top-[158px] bottom-0 overflow-y-auto scroll-hide"><div class="relative content-stretch flex flex-col gap-[12px] items-start ml-[16px] pt-[16px] pb-[130px] w-[370px]" data-node-id="141:4578">
+      <div class="scroller absolute left-0 right-0 top-[158px] bottom-0 overflow-y-auto scroll-hide"><div class="relative content-stretch flex flex-col gap-[12px] items-start ml-[16px] pt-[16px] pb-[186px] w-[370px]" data-node-id="141:4578">
         <div class="h-[208px] overflow-clip relative rounded-[16px] shrink-0 w-full" data-node-id="130:1118" data-name="Preview player · 3:00 · landscape">
           <video class="overview-clip absolute inset-0 max-w-none object-cover pointer-events-none size-full rounded-[inherit]" src="assets/vlog/clip_old_houses.mp4" poster="assets/vlog/shot_05.jpg" autoplay muted loop playsinline preload="auto"></video>
           <div class="absolute bg-gradient-to-b from-[rgba(10,13,18,0)] h-[90px] left-0 to-[rgba(10,13,18,0.6)] top-[118px] w-[370px]" data-node-id="130:1119" data-name="Bottom shade"></div>
@@ -4137,6 +4145,7 @@ function go(k,skipPageTransition=false){
   const el=$(k);
   el.querySelectorAll('.scroller').forEach(s=>s.scrollTop=0);
   if(k==='ready')startFinalVideo(el);
+  if(k==='overview')renderOverviewTray();
   if(k==='overview'){const clip=el.querySelector('video.overview-clip');if(clip){clip.currentTime=0;clip.play()?.catch(()=>{});}}
   // sheet entrance (not when only the sheet content changes s1 -> s2)
   const sh=el.querySelector('.sheet');
@@ -4183,6 +4192,10 @@ function completeAutoCut(){
   styles.animate([{opacity:0},{opacity:1}],{duration:420,easing:'cubic-bezier(.22,1,.36,1)'});
 }
 function restart(){resetState();go('home');}
+function renderOverviewTray(){
+  const empty=demoPicked?[11,14,15,18,19]:null;
+  $('overview').querySelectorAll('.ov-slot').forEach(slot=>{const n=Number(slot.dataset.shot);slot.classList.toggle('is-filled',empty?!empty.includes(n):n<=5);});
+}
 // The finished vlog plays with its real time and progress; the demo ends when it finishes.
 function bindFinalPlayer(root){
   const video=root.querySelector('video.final-video');if(!video||video.dataset.bound)return video;video.dataset.bound='1';
@@ -4835,7 +4848,7 @@ function showFlowHint(reveal=false){
   if(scroller){
     const box=scroller.getBoundingClientRect();clip={left:Math.max(screen.left,box.left),right:Math.min(screen.right,box.right),top:Math.max(screen.top,box.top),bottom:Math.min(screen.bottom,box.bottom)};
     // The fixed bottom bar (buttons / shot tray) covers the end of the scroll area.
-    const bar=scroller.closest('.screen')?.querySelector('[data-node-id="127:1704"],[data-node-id="156:1523"]');
+    const bar=scroller.closest('.screen')?.querySelector('[data-node-id="ov:tray"],[data-node-id="156:1523"]');
     if(bar&&!scroller.contains(bar)){const barTop=bar.getBoundingClientRect().top;if(barTop>clip.top)clip.bottom=Math.min(clip.bottom,barTop);}
   }
   if(!rect.width||!rect.height)return;
