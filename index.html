@@ -122,6 +122,10 @@
   .skeleton-styles{display:flex;gap:12px;margin-bottom:18px;}
   .skeleton-styles i{display:block;flex-shrink:0;width:80px;height:96px;background:#242427;border-radius:8px;}
   .skeleton-music{width:130px;height:9px;background:#29292c;border-radius:5px;}
+  .shot-slot{border-style:dashed!important;border-color:rgba(162,169,174,.8)!important;background:rgba(255,255,255,.7)!important;opacity:.45!important;filter:none!important;width:40px!important;height:40px!important;cursor:pointer;}
+  .shot-slot.is-current{border-style:solid!important;border-color:rgba(1,202,225,.6)!important;background:white!important;opacity:1!important;width:44px!important;height:44px!important;filter:drop-shadow(0 3px 6px rgba(1,202,225,.12))!important;}
+  .shot-add{display:none;position:absolute;inset:0;color:#01cae1;font:400 22px/1 Inter,system-ui;align-items:center;justify-content:center;}
+  .shot-slot.is-current .shot-add{display:flex;}
   /* CapCut's restrained type hierarchy and cyan-blue flow marker, on the dark demo stage. */
   .panel{position:absolute;right:calc(50% + 240px);top:50%;transform:translateY(-50%);width:240px;font-size:13px;color:#96969f;max-height:86vh;overflow:auto;scrollbar-width:none;}
   .panel h1{font-size:15px;font-weight:600;line-height:22px;margin:0 0 7px;color:#f0f0f4;}
@@ -2253,15 +2257,11 @@
           <div class="relative rounded-[9px] shrink-0 size-[40px]" data-node-id="168:1201" data-name="Shot 5 · added">
             <img alt="" class="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[9px] size-full" src="assets/29649ac1-0971-474f-a585-e1e0432d4f65.webp" />
           </div>
-          <div class="bg-white border-[0.8px] border-[rgba(1,202,225,0.6)] border-solid drop-shadow-[0px_3px_6px_rgba(1,202,225,0.12)] relative rounded-[10px] shrink-0 size-[44px]" data-node-id="168:1206" data-act="album:part" data-name="Shot 6 · empty">
-            <div class="absolute left-[14.2px] size-[14px] top-[14.2px]" data-node-id="168:1207" data-name="Frame">
-              <img alt="" class="absolute block inset-0 max-w-none size-full" src="assets/b1bf0c82-7702-4a89-9e4e-ed34a1914391.svg" />
-            </div>
+          <div class="shot-slot is-current bg-white border-[0.8px] border-[rgba(1,202,225,0.6)] border-solid drop-shadow-[0px_3px_6px_rgba(1,202,225,0.12)] relative rounded-[10px] shrink-0 size-[44px]" data-node-id="168:1206" data-act="shot:6" data-name="Shot 6 · empty">
+            <span class="shot-add" aria-hidden="true">+</span>
           </div>
-          <div class="bg-[rgba(255,255,255,0.7)] border border-[rgba(162,169,174,0.8)] border-dashed opacity-45 relative rounded-[9px] shrink-0 size-[40px]" data-node-id="168:1211" data-name="Shot 7 · empty">
-            <div class="absolute left-[12px] size-[14px] top-[12px]" data-node-id="168:1212" data-name="Frame">
-              <img alt="" class="absolute block inset-0 max-w-none size-full" src="assets/297483d8-ecca-418e-a0a5-30010ca630b9.svg" />
-            </div>
+          <div class="shot-slot bg-[rgba(255,255,255,0.7)] border border-[rgba(162,169,174,0.8)] border-dashed opacity-45 relative rounded-[9px] shrink-0 size-[40px]" data-node-id="168:1211" data-act="shot:7" data-name="Shot 7 · empty">
+            <span class="shot-add" aria-hidden="true">+</span>
           </div>
         </div>
         <div class="content-stretch flex gap-[10px] items-start overflow-clip relative shrink-0 w-full" data-node-id="201:1203" data-name="Actions">
@@ -4296,6 +4296,12 @@ function switchDetailTab(key){
 function enterAlbum(){
   albumOrigin=cur;
   albumReturnState={page:cur,scroll:$(cur).querySelector('.scroller')?.scrollTop||0,tabs:detailTabs(cur).scrollLeft};
+  for(const key of ['album1','album2','album3','album4'])$(key).querySelectorAll('p').forEach(label=>{
+    if(label.textContent.includes('Walk into frame')||label.textContent.includes('Tree shadows sweep by')){
+      if(!label.dataset.originalShotLabel)label.dataset.originalShotLabel=label.textContent;
+      label.textContent=selectedDetailShot===7?label.dataset.originalShotLabel.replace('6 Walk into frame','7 Tree shadows sweep by'):label.dataset.originalShotLabel;
+    }
+  });
   go('album1');
 }
 function exitAlbum(){
@@ -4305,11 +4311,34 @@ function exitAlbum(){
   detailTabs(state.page).scrollLeft=state.tabs;
 }
 
+// The empty slots select shots first. Only the active slot opens the album.
+let selectedDetailShot=6;
+const shot6Fields=new Map(['156:1465','156:1466','156:1473','167:4809','167:4817'].map(id=>[id,node('part',id).textContent]));
+function selectDetailShot(number){
+  if(number===selectedDetailShot){enterAlbum();return;}
+  const previous=selectedDetailShot;selectedDetailShot=number;
+  for(const [shot,id] of [[6,'168:1206'],[7,'168:1211']]){
+    const cell=node('part',id);cell.classList.add('shot-slot');cell.classList.toggle('is-current',shot===number);cell.dataset.act='shot:'+shot;
+    cell.setAttribute('aria-label','Shot '+shot+(shot===number?' selected, add footage':' — view shot'));
+  }
+  for(const [id,text] of shot6Fields)node('part',id).textContent=text;
+  if(number===7){
+    node('part','156:1465').textContent='7';node('part','156:1466').textContent='Tree shadows sweep by';node('part','156:1473').textContent='3s';
+    node('part','167:4809').textContent='Close shot of tree shadows on the pavement.';
+    node('part','167:4817').textContent=node('outline','102:870').textContent.trim();
+  }
+  node('part','162:1230').style.display=number===7?'none':'';
+  node('part','162:1225').parentElement.style.display=number===7?'none':'';
+  const content=$('part').querySelector('.scroller');content.scrollTop=0;
+  if(!reducedMotion())content.animate([{transform:`translate3d(${number>previous?'100%':'-100%'},0,0)`},{transform:'translate3d(0,0,0)'}],{duration:420,easing:'cubic-bezier(.22,1,.36,1)'});
+}
+
 
 // state that changes during the demo
 const partCell=node('part','168:1206'), partCellHTML=partCell.outerHTML;
 function resetState(){
   demoRecordedShot=false;
+  if(selectedDetailShot!==6)selectDetailShot(6);
   const summary=node('outline','92:890');
   if(summary.getAttribute('aria-expanded')==='false')toggleOutline(summary);
   planSheets.s3.querySelectorAll('[data-chip]').forEach(e=>{if(e.classList.contains('bg-[#0b1119]'))chip(e);});
@@ -4320,7 +4349,7 @@ function resetState(){
 function markShot6(){
   demoRecordedShot=true;
   const c=node('part','168:1206'); const src=node('review','198:1208').querySelector('img').getAttribute('src');
-  c.dataset.act='album:part';
+  c.dataset.act='shot:6';
   c.className='relative rounded-[10px] shrink-0 size-[44px] border-2 border-[#01cae1] border-solid drop-shadow-[0px_3px_6px_rgba(1,202,225,0.12)] overflow-hidden';
   c.innerHTML=`<img alt="" class="absolute inset-0 max-w-none object-cover size-full" src="${src}">`;
 }
@@ -4366,6 +4395,7 @@ document.getElementById('vp').addEventListener('click',e=>{
   else if(a==='hide'){const n=node(cur,arg); if(n) n.style.display='none';}
   else if(a==='seg') seg(t);
   else if(a==='tile')planFinishSetup(t);
+  else if(a==='shot')selectDetailShot(Number(arg));
   else if(a==='shotdone'){markShot6();go('part');}
   else if(a==='outline-toggle') toggleOutline(t);
   else if(a==='progress-toggle')toggleGeneration(t);
