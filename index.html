@@ -124,8 +124,9 @@
   .skeleton-music{width:130px;height:9px;background:#29292c;border-radius:5px;}
   .shot-slot{border-style:dashed!important;border-color:rgba(162,169,174,.8)!important;background:rgba(255,255,255,.7)!important;opacity:.45!important;filter:none!important;width:40px!important;height:40px!important;cursor:pointer;}
   .shot-slot.is-current{border-style:solid!important;border-color:rgba(1,202,225,.6)!important;background:white!important;opacity:1!important;width:44px!important;height:44px!important;filter:drop-shadow(0 3px 6px rgba(1,202,225,.12))!important;}
-  .shot-add{display:none;position:absolute;inset:0;color:#01cae1;font:400 22px/1 Inter,system-ui;align-items:center;justify-content:center;}
+  .shot-add{display:none;position:absolute;inset:0;color:#01cae1;align-items:center;justify-content:center;}
   .shot-slot.is-current .shot-add{display:flex;}
+  .shot-add svg{display:block;flex-shrink:0;}
   .demo-action{display:flex;align-items:center;justify-content:center;gap:8px!important;height:48px!important;min-height:48px;box-sizing:border-box;border-radius:24px!important;color:#111418;}
   .demo-action-secondary{background:rgba(23,23,26,.04)!important;border:1px solid rgba(23,23,26,.1)!important;}
   .demo-action-primary{background:#01cae1!important;border:1px solid transparent!important;}
@@ -2252,10 +2253,10 @@
             <img alt="" class="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[9px] size-full" src="assets/29649ac1-0971-474f-a585-e1e0432d4f65.webp" />
           </div>
           <div class="shot-slot is-current bg-white border-[0.8px] border-[rgba(1,202,225,0.6)] border-solid drop-shadow-[0px_3px_6px_rgba(1,202,225,0.12)] relative rounded-[10px] shrink-0 size-[44px]" data-node-id="168:1206" data-act="shot:6" data-name="Shot 6 · empty">
-            <span class="shot-add" aria-hidden="true">+</span>
+            <span class="shot-add" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2v12M2 8h12"/></svg></span>
           </div>
           <div class="shot-slot bg-[rgba(255,255,255,0.7)] border border-[rgba(162,169,174,0.8)] border-dashed opacity-45 relative rounded-[9px] shrink-0 size-[40px]" data-node-id="168:1211" data-act="shot:7" data-name="Shot 7 · empty">
-            <span class="shot-add" aria-hidden="true">+</span>
+            <span class="shot-add" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2v12M2 8h12"/></svg></span>
           </div>
         </div>
         <div class="content-stretch flex gap-[10px] items-start overflow-clip relative shrink-0 w-full" data-node-id="201:1203" data-name="Actions">
