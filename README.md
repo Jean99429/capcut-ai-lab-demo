@@ -1,3 +1,6 @@
-# CapCut AI Lab — Vlog Demo
+# CapCut AI Lab
 
-Interactive product design prototype. Open the GitHub Pages site to explore the guided flow.
+- [Interaction analysis](https://jean99429.github.io/capcut-ai-lab-demo/analysis/)
+- [Interactive prototype](https://jean99429.github.io/capcut-ai-lab-demo/)
+
+The prototype remains at the repository root. The analysis is published under `analysis/` and links to the root prototype.

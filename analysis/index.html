@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CapCut AI Lab 交互分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Colors and controls follow capcut.com (read 2026-11-12); type kept quiet for an analysis page. */
+  :root{
+    --page:#fff;
+    --ink:#090c14;
+    --muted:rgba(28,40,61,.64);
+    --faint:rgba(31,47,69,.4);
+    --line:rgba(42,67,94,.1);
+    --soft:rgba(42,67,94,.08);
+    --accent:#01e0f8;
+    --content:1200px;
+    --font:Inter,"PingFang SC","Noto Sans SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--page);color:var(--ink);font:400 15px/1.7 var(--font);-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,p{margin:0;}
+  a{color:inherit;text-decoration:none;}
+  img{display:block;max-width:100%;height:auto;}
+  :focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:6px;}
+  .container{width:min(var(--content),calc(100% - 80px));margin-inline:auto;}
+
+  /* Top bar */
+  .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:saturate(1.6) blur(16px);-webkit-backdrop-filter:saturate(1.6) blur(16px);}
+  .topbar .container{display:flex;align-items:center;gap:32px;height:60px;}
+  .brand{display:inline-flex;align-items:center;flex-shrink:0;line-height:0;}
+  .brand img{width:106px;height:20px;}
+  .nav{display:flex;gap:24px;font-size:14px;line-height:18px;color:var(--muted);}
+  .nav a{transition:color .18s ease;}
+  .nav a:hover{color:var(--ink);}
+  .topbar .btn-dark{margin-left:auto;}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;white-space:nowrap;cursor:pointer;border:0;transition:filter .18s ease;}
+  .btn:hover{filter:brightness(.95);}
+  .btn-dark{height:34px;padding:0 14px;border-radius:10px;background:var(--ink);color:#fff;font-size:13px;}
+  .btn-md{height:44px;padding:0 20px;border-radius:12px;font-size:14px;}
+  .btn-primary{background:var(--accent);color:var(--ink);}
+  .btn-secondary{background:var(--soft);color:var(--ink);}
+  .prototype-cta{display:flex;justify-content:center;align-items:center;margin-top:64px;padding:96px 24px;}
+  .prototype-cta .btn{width:min(100%,420px);min-height:68px;padding:18px 32px;gap:20px;border-radius:14px;font-size:clamp(18px,2vw,22px);}
+  .prototype-cta svg{width:24px;height:24px;flex-shrink:0;}
+
+
+  /* Hero */
+  .hero{padding:136px 0 88px;
+    background:
+      radial-gradient(60% 55% at 12% 0%,#eceeff 0%,rgba(236,238,255,0) 70%),
+      radial-gradient(55% 50% at 92% 4%,#e6fbff 0%,rgba(230,251,255,0) 70%),
+      var(--page);}
+  .topbar{background:rgba(255,255,255,.6);}
+  .hero-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:center;}
+  .eyebrow{display:flex;align-items:center;gap:8px;font-size:13px;line-height:18px;color:var(--muted);}
+  .eyebrow i{width:3px;height:3px;border-radius:50%;background:var(--faint);}
+  .hero h1{margin-top:16px;font-size:40px;line-height:1.3;font-weight:600;letter-spacing:-.01em;}
+  .hl{background:linear-gradient(90deg,#00cfe9,#3fc8ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero .lead{margin-top:16px;max-width:30em;color:var(--muted);}
+  .actions{display:flex;gap:10px;margin-top:28px;}
+  .byline{margin-top:20px;font-size:13px;color:var(--faint);}
+
+  /* Composed preview: real pieces of the prototype, lifted out of the screen (capcut.com tool-page style) */
+  .stage-wrap{container-type:inline-size;}
+  .stage{--u:calc(100cqw / 680);position:relative;aspect-ratio:680/560;border-radius:24px;overflow:hidden;
+    background:linear-gradient(155deg,#eefcff 0%,#dcf6ff 48%,#d3e9ff 100%);}
+  .stage *{box-sizing:border-box;}
+  .stage .u{position:absolute;}
+  .glass{background:rgba(255,255,255,.92);box-shadow:0 calc(8*var(--u)) calc(24*var(--u)) rgba(28,60,90,.10);}
+
+  .clip{left:calc(196*var(--u));top:calc(40*var(--u));width:calc(268*var(--u));height:calc(356*var(--u));border-radius:calc(20*var(--u));overflow:hidden;box-shadow:0 calc(18*var(--u)) calc(40*var(--u)) rgba(28,60,90,.18);}
+  .clip img{width:100%;height:100%;object-fit:cover;}
+  .clip-tag{position:absolute;left:calc(12*var(--u));top:calc(12*var(--u));display:flex;align-items:center;gap:calc(5*var(--u));padding:calc(3*var(--u)) calc(8*var(--u));border-radius:calc(6*var(--u));background:rgba(0,0,0,.35);color:#fff;font-size:calc(11*var(--u));line-height:1.4;}
+  .clip-tag svg{width:calc(12*var(--u));height:calc(12*var(--u));}
+  .clip-bar{position:absolute;left:calc(12*var(--u));right:calc(12*var(--u));bottom:calc(14*var(--u));height:calc(3*var(--u));border-radius:9px;background:rgba(255,255,255,.35);overflow:hidden;}
+  .clip-bar i{display:block;height:100%;width:100%;background:#fff;transform-origin:left;transform:scaleX(0);animation:play 9s linear infinite;}
+  @keyframes play{to{transform:scaleX(1);}}
+
+  .ask{left:calc(28*var(--u));top:calc(70*var(--u));padding:calc(10*var(--u)) calc(14*var(--u));border-radius:calc(14*var(--u));font-size:calc(14*var(--u));line-height:1.3;color:#14191f;white-space:nowrap;}
+  .gen{left:calc(44*var(--u));top:calc(128*var(--u));display:flex;align-items:center;gap:calc(8*var(--u));padding:calc(8*var(--u)) calc(14*var(--u)) calc(8*var(--u)) calc(10*var(--u));border-radius:999px;font-size:calc(13*var(--u));line-height:1.3;color:#3b4148;white-space:nowrap;border:1px solid rgba(1,224,248,.45);}
+  .spin{width:calc(16*var(--u));height:calc(16*var(--u));border-radius:50%;border:calc(1.5*var(--u)) solid #d9dee3;border-top-color:#01cae1;animation:spin .8s linear infinite;flex-shrink:0;}
+  .gen.done .spin{animation:none;border:none;background:#01cae1 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4.5 8.2 2.3 2.3 4.7-4.9' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat;}
+  .pct{font-variant-numeric:tabular-nums;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .setup{left:calc(404*var(--u));top:calc(150*var(--u));width:calc(252*var(--u));padding:calc(14*var(--u)) calc(16*var(--u));border-radius:calc(16*var(--u));}
+  .setup h4{margin:0 0 calc(8*var(--u));display:flex;align-items:center;gap:calc(6*var(--u));font-size:calc(13*var(--u));line-height:1.3;font-weight:600;color:#111418;}
+  .setup h4 svg{width:calc(15*var(--u));height:calc(15*var(--u));}
+  .setup dl{margin:0;}
+  .setup dt{margin-top:calc(7*var(--u));font-size:calc(10.5*var(--u));line-height:1.3;color:#92999d;}
+  .setup dd{margin:calc(2*var(--u)) 0 0;font-size:calc(11.5*var(--u));line-height:1.4;color:#14191f;}
+
+  .tray{left:calc(28*var(--u));right:calc(28*var(--u));bottom:calc(28*var(--u));display:flex;align-items:center;gap:calc(8*var(--u));padding:calc(12*var(--u));border-radius:calc(18*var(--u));}
+  .slot{position:relative;width:calc(48*var(--u));height:calc(48*var(--u));flex-shrink:0;border-radius:calc(10*var(--u));overflow:hidden;}
+  .slot img{width:100%;height:100%;object-fit:cover;}
+  .slot.empty{border:1px dashed rgba(162,169,174,.8);background:rgba(255,255,255,.7);}
+  .slot.empty img{opacity:0;transform:scale(1.08);transition:opacity .45s ease,transform .45s ease;}
+  .slot.filled img{opacity:1;transform:none;}
+  .slot.filled{border-style:solid;border-color:transparent;}
+  .slot .n{position:absolute;left:calc(5*var(--u));top:calc(3*var(--u));font-size:calc(10*var(--u));font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);}
+  .slot.empty:not(.filled) .n{color:#a2a9ae;text-shadow:none;}
+  .pick{margin-left:auto;position:relative;overflow:hidden;display:flex;align-items:center;gap:calc(6*var(--u));height:calc(40*var(--u));padding:0 calc(14*var(--u));border-radius:999px;background:#f2f4f6;font-size:calc(13*var(--u));font-weight:600;color:#111418;white-space:nowrap;}
+  .pick svg{width:calc(15*var(--u));height:calc(15*var(--u));color:#01cae1;}
+  .pick::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(1,224,248,.35) 50%,transparent 70%);transform:translateX(-100%);}
+  .pick.run::after{animation:sweep 1.1s ease-in-out;}
+  @keyframes sweep{to{transform:translateX(100%);}}
+  .cut{display:flex;align-items:center;height:calc(40*var(--u));padding:0 calc(16*var(--u));border-radius:999px;background:var(--accent);font-size:calc(13*var(--u));font-weight:600;color:#111418;white-space:nowrap;}
+  .matched{position:absolute;left:calc(28*var(--u));bottom:calc(104*var(--u));padding:calc(5*var(--u)) calc(10*var(--u));border-radius:999px;background:rgba(9,12,20,.78);color:#fff;font-size:calc(12*var(--u));line-height:1.3;opacity:0;transform:translateY(calc(6*var(--u)));transition:opacity .35s ease,transform .35s ease;white-space:nowrap;}
+  .matched.show{opacity:1;transform:none;}
+
+  /* Gentle drift so the pieces feel alive, not busy */
+  .float-a{animation:drift 6s ease-in-out infinite alternate;}
+  .float-b{animation:drift 7s ease-in-out -2s infinite alternate;}
+  @keyframes drift{from{transform:translateY(0)}to{transform:translateY(calc(-6*var(--u)))}}
+
+  /* Section frame (EditPilot / Captions body pattern: centered title + short gray lead) */
+  .section{padding:104px 0;scroll-margin-top:60px;}
+  .section--soft{background:#f6f8fb;}
+  .sec-head{max-width:680px;margin:0 auto 56px;text-align:center;}
+  .sec-no{font-size:13px;line-height:18px;color:var(--faint);letter-spacing:.02em;}
+  .sec-head h2{margin-top:10px;font-size:32px;line-height:1.3;font-weight:600;letter-spacing:-.01em;}
+  .sec-head p{margin-top:14px;color:var(--muted);font-size:16px;line-height:1.75;}
+
+  /* 01 Needs: four breaks along one path */
+  .breaks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;list-style:none;margin:0;padding:0;}
+  .break-shot{position:relative;display:flex;justify-content:center;padding:28px 0 0;height:420px;overflow:hidden;border-radius:20px;
+    background:linear-gradient(170deg,#ffffff 0%,#eef3f9 100%);}
+  .break-shot .scr{position:relative;width:min(62%,176px);align-self:flex-start;}
+  .break-shot img{width:100%;border-radius:16px;}
+  .break-shot .base{box-shadow:0 12px 30px rgba(28,40,61,.14);transition:opacity .6s ease,filter .6s ease;}
+  /* Spotlight: the whole screen fades back, only the marked area stays sharp */
+  .break-shot .focus{position:absolute;inset:0;height:100%;object-fit:cover;opacity:0;transition:opacity .6s ease;
+    clip-path:inset(var(--t) calc(100% - var(--l) - var(--w)) calc(100% - var(--t) - var(--h)) var(--l) round 10px);}
+  .is-in .base{opacity:.4;filter:blur(1.5px) saturate(.6);}
+  .is-in .focus{opacity:1;}
+  .ring{position:absolute;left:var(--l);top:var(--t);width:var(--w);height:var(--h);border:2px solid var(--accent);border-radius:10px;box-shadow:0 0 0 4px rgba(1,224,248,.16);opacity:0;transform:scale(.96);transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1);}
+  .tip{top:calc(var(--t) - 34px);}
+  .tip{position:absolute;left:50%;padding:5px 10px;border-radius:999px;background:rgba(9,12,20,.86);color:#fff;font-size:12px;line-height:1.35;white-space:nowrap;transform:translate(-50%,6px);opacity:0;transition:opacity .45s ease,transform .45s cubic-bezier(.22,1,.36,1);}
+  .tip::after{content:"";position:absolute;left:50%;bottom:-4px;width:8px;height:8px;background:inherit;transform:translateX(-50%) rotate(45deg);border-radius:1px;}
+  .tip.below::after{bottom:auto;top:-4px;}
+  .is-in .ring{opacity:1;transform:none;}
+  .is-in .tip{opacity:1;transform:translate(-50%,0);}
+
+  .path{position:relative;height:36px;margin:22px 0 18px;}
+  .path::before,.path::after{content:"";position:absolute;top:50%;height:1.5px;background:#d6dde5;transform:scaleX(0);transition:transform .7s cubic-bezier(.22,1,.36,1);}
+  .path::before{left:-12px;right:calc(50% + 22px);transform-origin:right;}
+  .path::after{left:calc(50% + 22px);right:-12px;transform-origin:left;}
+  .breaks li:first-child .path::before{left:50%;opacity:0;}
+  .breaks li:last-child .path::after{right:50%;opacity:0;}
+  .breaks.is-in .path::before,.breaks.is-in .path::after{transform:scaleX(1);}
+  .node{position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff;border:1.5px solid #d6dde5;font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .break-copy{text-align:center;padding:0 6px;}
+  .break-copy h3{font-size:18px;line-height:1.4;font-weight:600;}
+  .break-copy p{margin-top:8px;font-size:14px;line-height:1.7;color:var(--muted);}
+  .source{margin-top:28px;text-align:center;font-size:12px;color:var(--faint);}
+
+  /* Conclusion: compact panel in the hero preview's soft cyan; label as a bright cyan tag */
+  .verdict{max-width:800px;margin:64px auto 0;padding:28px 36px 30px;border-radius:20px;text-align:center;
+    background:linear-gradient(155deg,#eefcff 0%,#dcf6ff 48%,#d3e9ff 100%);}
+  .verdict .label{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--accent);color:var(--ink);font-size:12px;line-height:20px;font-weight:600;}
+  .verdict .statement{max-width:680px;margin:12px auto 0;font-size:17px;line-height:1.75;font-weight:600;color:var(--ink);}
+  .verdict .statement span{font-weight:400;color:var(--muted);}
+
+  /* 02 Research: one comparison table; row labels once on the left, one column per product */
+  .sec-head .criteria{margin-top:10px;font-size:13px;line-height:1.7;color:var(--faint);}
+  .table-scroll{overflow-x:auto;}
+  .matrix{width:100%;min-width:880px;border-collapse:collapse;table-layout:fixed;text-align:left;}
+  .matrix .label-col{width:112px;}
+  .matrix thead th{padding:0 20px 28px;vertical-align:bottom;font-weight:400;}
+  .matrix thead .break-shot{height:400px;margin-bottom:20px;}
+  .matrix thead .break-shot .scr{width:min(54%,190px);}
+  .matrix .kind{display:block;font-size:13px;line-height:18px;color:var(--faint);}
+  .matrix .name{display:block;margin-top:4px;font-size:20px;line-height:1.3;font-weight:600;color:var(--ink);}
+  .matrix .maker{display:block;margin-top:4px;font-size:13px;line-height:1.5;color:var(--faint);}
+  .matrix tbody th{padding:18px 20px 18px 0;vertical-align:top;font-size:13px;line-height:1.75;font-weight:600;color:var(--muted);white-space:nowrap;border-top:1px solid var(--line);}
+  .matrix tbody td{padding:18px 20px;vertical-align:top;font-size:14px;line-height:1.75;color:var(--ink);border-top:1px solid var(--line);}
+  .matrix tbody tr:last-child > *{border-bottom:1px solid var(--line);}
+  .matrix .state{margin-left:8px;font-size:13px;color:var(--faint);}
+  .flow{margin:0;padding:0;list-style:none;counter-reset:step;}
+  .flow li{position:relative;padding-left:24px;counter-increment:step;}
+  .flow li + li{margin-top:4px;}
+  .flow li::before{content:counter(step);position:absolute;left:0;top:4px;width:16px;height:16px;border-radius:50%;background:var(--soft);font-size:10px;line-height:16px;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums;}
+
+  /* Spectrum: the two ends the products sit at, with an open question in between */
+  .spectrum{position:relative;max-width:620px;margin:4px auto 24px;display:grid;grid-template-columns:1fr 1.2fr 1fr;align-items:start;text-align:center;}
+  .spectrum::before{content:"";position:absolute;left:16.5%;right:16.5%;top:13px;border-top:1.5px dashed #c9d1da;}
+  .spectrum i{position:relative;display:flex;align-items:center;justify-content:center;width:26px;height:26px;margin:0 auto;border-radius:50%;font-style:normal;}
+  .end i::after{content:"";width:14px;height:14px;border-radius:50%;background:var(--ink);}
+  .end i{background:transparent;}
+  .gap i{background:#eaf9ff;border:1.5px dashed #9aa5b1;font-size:13px;font-weight:600;color:var(--muted);}
+  .spectrum b{display:block;margin-top:12px;font-size:14px;font-weight:600;color:var(--ink);}
+  .spectrum small{display:block;margin-top:4px;font-size:13px;color:var(--faint);}
+
+
+  /* 03 Goals & strategy */
+  .sub-head{margin:0 0 24px;font-size:20px;line-height:1.4;font-weight:600;}
+  .sub-head small{display:block;margin-top:4px;font-size:14px;font-weight:400;color:var(--muted);}
+  .block + .block{margin-top:96px;}
+  #strategy > .container{width:min(1120px,calc(100% - 128px));}
+  #strategy .block + .block{margin-top:144px;}
+  /* Goals: open icon columns inspired by the CapCut Desktop feature row. */
+  .goal-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;padding-top:12px;}
+  .goal{display:flex;flex-direction:column;align-items:center;text-align:center;padding:22px 20px;border-radius:20px;background:color-mix(in srgb,var(--accent) 8%,white);border:1.5px solid color-mix(in srgb,var(--accent) 38%,transparent);}
+  .goal-icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--accent);filter:drop-shadow(0 0 5px color-mix(in srgb,var(--accent) 28%,transparent));}
+  .goal-icon svg{width:40px;height:40px;}
+  .goal-context{max-width:25em;margin:14px 0 0;font-size:12.5px;line-height:1.65;color:var(--muted);}
+  .goal-context .context-quote{display:inline-block;width:15px;height:15px;margin-right:5px;vertical-align:-3px;fill:currentColor;stroke:none;transform:rotate(180deg);}
+  .goal-cards.is-in .goal-icon svg > :is(path,circle,rect,line,polyline){animation:goal-draw 1s ease both;animation-delay:var(--goal-delay,0s);}
+  .goal:nth-child(2){--goal-delay:.15s;}
+  .goal:nth-child(3){--goal-delay:.3s;}
+  @keyframes goal-draw{from{stroke-dasharray:1;stroke-dashoffset:1;opacity:.3;}to{stroke-dasharray:1;stroke-dashoffset:0;opacity:1;}}
+  .goal h4{margin:12px 0 0;font-size:20px;line-height:1.4;font-weight:600;}
+  .goal .what{max-width:25em;margin:12px 0 0;font-size:14px;line-height:1.8;letter-spacing:.025em;color:var(--muted);}
+
+  /* Strategy: three readable stories, with a visual tailored to each mechanism. */
+  .strategy-stories{display:grid;gap:144px;}
+  .strategy-story{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);grid-template-areas:"copy visual";gap:88px;align-items:center;}
+  .strategy-story:nth-child(even){grid-template-columns:minmax(0,6fr) minmax(0,5fr);grid-template-areas:"visual copy";}
+  .strategy-copy{grid-area:copy;}
+  .strategy-visual{grid-area:visual;}
+  .strategy-copy .strategy-number{margin-bottom:14px;font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--muted);}
+  .strategy-copy h4{margin:0;font-size:26px;line-height:1.45;font-weight:600;letter-spacing:-.02em;}
+  .strategy-copy p:last-child{margin-top:16px;font-size:15px;line-height:1.85;color:var(--muted);max-width:30em;}
+  .strategy-visual{min-width:0;margin:0;padding:32px;border-radius:24px;background:linear-gradient(150deg,color-mix(in srgb,var(--accent) 5%,white),#f3f6fb);}
+  .strategy-visual figure{min-width:0;margin:0;}
+  .strategy-visual a{display:block;border-radius:12px;overflow:hidden;}
+  .strategy-visual img{width:100%;height:auto;}
+  .strategy-visual figcaption{margin-top:12px;text-align:center;font-size:13px;line-height:1.6;color:var(--muted);}
+  .input-sheets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:end;}
+  .input-sheets a{box-shadow:0 8px 24px rgba(28,40,61,.07);background:#fff;}
+  .strategy-handoff{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin:24px 0 0;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);text-align:center;}
+  .strategy-handoff strong{font-weight:500;color:var(--ink);}
+  .flow-arrow{color:var(--ink);font-size:18px;line-height:1;}
+  .layer-comparison{display:grid;grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr);align-items:center;gap:14px;}
+  .layer-label{display:block;margin-bottom:12px;font-size:15px;font-weight:600;text-align:center;}
+  .layer-comparison a{background:#fff;box-shadow:0 8px 24px rgba(28,40,61,.06);}
+  .layer-comparison .flow-arrow{text-align:center;}
+  .route-branches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;}
+  .route-branches a{max-width:164px;margin:auto;max-height:205px;overflow:hidden;background:#fff;}
+  .route-branches img{aspect-ratio:4/5;object-fit:cover;object-position:top;}
+  .route-branches .layer-label{font-size:14px;}
+  .route-merge{position:relative;width:55%;height:32px;margin:14px auto 0;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);border-top:0;border-radius:0 0 14px 14px;}
+  .route-merge::after{content:"";position:absolute;left:50%;bottom:-14px;height:13px;border-left:1px solid color-mix(in srgb,var(--accent) 55%,transparent);}
+  .shared-tray{max-width:380px;margin:28px auto 0;padding:16px;border-radius:16px;background:#fff;border:1px solid var(--line);}
+  .shared-tray .layer-label{margin-bottom:10px;font-size:14px;}
+  .shared-tray a{border-radius:8px;}
+  .shared-tray p{margin-top:10px;text-align:center;font-size:12px;color:var(--muted);}
+
+  /* AI along the flow, drawn as an editing timeline: one track per row, one clip per node */
+  .tl{position:relative;margin-top:10px;display:grid;grid-template-columns:112px repeat(6,minmax(0,1fr));column-gap:6px;row-gap:10px;min-width:900px;}
+  .tl-label{display:flex;align-items:center;font-size:13px;font-weight:600;color:var(--muted);}
+  .tl-ruler{position:relative;height:28px;border-bottom:1px solid #d6dde5;font-size:13px;color:var(--faint);display:flex;align-items:flex-start;}
+  .tl-ruler::before{content:"";position:absolute;left:0;bottom:0;height:8px;border-left:1px solid #c9d1da;}
+  .tl-ruler b{margin-left:8px;font-weight:600;color:var(--ink);font-size:15px;line-height:20px;}
+  .tl-ruler span{font-variant-numeric:tabular-nums;line-height:20px;}
+  .clip-ai{min-height:64px;padding:12px 14px;border-radius:10px;background:rgba(1,224,248,.12);box-shadow:inset 3px 0 0 var(--accent);font-size:14px;line-height:1.6;color:var(--ink);font-weight:500;}
+  .clip-fix{min-height:76px;padding:12px 14px;border-radius:10px;background:#f4f6f9;font-size:14px;line-height:1.6;color:var(--muted);}
+  .clip-fix .tag{display:table;margin-top:6px;}
+  .playhead{position:absolute;top:0;bottom:0;left:118px;width:2px;background:var(--ink);border-radius:2px;opacity:0;pointer-events:none;}
+  .playhead::before{content:"";position:absolute;top:-4px;left:-5px;width:12px;height:12px;border-radius:3px;background:var(--ink);}
+  .tl.is-in .playhead{animation:play-tl 3.2s cubic-bezier(.45,0,.25,1) .2s forwards;}
+  @keyframes play-tl{0%{opacity:1;left:118px}92%{opacity:1;left:calc(100% - 2px)}100%{opacity:0;left:calc(100% - 2px)}}
+  .tag{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--soft);font-size:12px;line-height:20px;color:var(--muted);}
+
+  @media (max-width:980px){
+    .nav{display:none;}
+    .hero-grid{grid-template-columns:minmax(0,1fr);gap:40px;}
+    .breaks{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:48px;}
+    .path::before,.path::after{display:none;}
+    .strategy-story,.strategy-story:nth-child(even){grid-template-columns:minmax(0,1fr);grid-template-areas:"copy" "visual";gap:24px;}
+    .strategy-copy p:last-child{max-width:48em;}
+    #strategy > .container{width:calc(100% - 80px);}
+    #strategy .block + .block{margin-top:112px;}
+    .strategy-stories{gap:96px;}
+    .goal-cards{grid-template-columns:minmax(0,1fr);max-width:520px;margin-inline:auto;}
+
+  }
+  @media (max-width:767px){
+    .container{width:calc(100% - 40px);}
+    #strategy > .container{width:calc(100% - 48px);}
+    #strategy .block + .block{margin-top:96px;}
+    .strategy-stories{gap:88px;}
+    .hero{padding:64px 0 64px;}
+    .hero h1{font-size:30px;}
+    .strategy-visual{padding:20px 16px;}
+    .strategy-copy h4{font-size:23px;}
+    .input-sheets{grid-template-columns:repeat(3,minmax(150px,1fr));overflow-x:auto;padding-bottom:12px;}
+    .layer-comparison{grid-template-columns:minmax(0,1fr);gap:20px;}
+    .layer-comparison figure{width:min(100%,260px);margin-inline:auto;}
+    .layer-comparison .flow-arrow{transform:rotate(90deg);}
+    .route-branches{gap:16px;}
+    .actions .btn{flex:1;}
+    .section{padding:72px 0;}
+    .prototype-cta{margin-top:40px;padding:72px 24px;}
+    .sec-head{margin-bottom:36px;}
+    .sec-head h2{font-size:26px;}
+    .breaks{grid-template-columns:minmax(0,1fr);}
+    .break-shot{height:380px;}
+    .break-shot .scr{width:min(56%,160px);}
+    .verdict{padding:24px 20px;}
+    .spectrum{grid-template-columns:1fr;gap:28px;}
+    .spectrum::before{display:none;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    .ring,.tip,.path::before,.path::after{transition:none!important;}
+    .tl.is-in .playhead{animation:none;}
+    .float-a,.float-b,.clip-bar i,.spin{animation:none!important;}
+    .slot.empty img{transition:none;}
+    .goal-cards.is-in .goal-icon svg > :is(path,circle,rect,line,polyline){animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="CapCut，返回顶部"><img src="assets/brand/capcut-logo.svg" width="106" height="20" alt="CapCut"></a>
+    <nav class="nav" aria-label="章节">
+      <a href="#needs">需求分析</a>
+      <a href="#research">竞品调研</a>
+      <a href="#strategy">设计目标与策略</a>
+      <a href="../index.html">方案</a>
+    </nav>
+    <a class="btn btn-dark" href="../index.html">交互原型</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero-grid">
+      <div>
+        <p class="eyebrow">CapCut AI 产品体验设计<i></i>题目一</p>
+        <h1 id="hero-title">AI 走完流程，<br>用户只做<span class="hl">关键决策</span></h1>
+        <p class="lead">现有能力各自停在流程中的某一个节点，用户无法独立走完整条路径。因此应由 AI 承担流程，用户只在关键节点做决策。</p>
+        <div class="actions">
+          <a class="btn btn-md btn-primary" href="../index.html">体验交互原型</a>
+        </div>
+        <p class="byline">Jean · 2026.11.12</p>
+      </div>
+
+      <div class="stage-wrap">
+        <div class="stage" role="img" aria-label="原型局部拼合预览：用户说一句想法，AI 生成大纲，拍摄参考用 Where / Frame / Move 白话说明拍法，Pick for me 把素材放进镜头格，最后 AutoCut 出片">
+          <div class="u clip">
+            <img src="assets/photos/houses.jpg" alt="">
+            <span class="clip-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg>Video</span>
+            <span class="clip-bar"><i></i></span>
+          </div>
+
+          <div class="u ask glass float-a">Help me make a vlog</div>
+          <div class="u gen glass float-b" id="gen"><span class="spin"></span><span id="gen-label">Writing your outline · <span class="pct" id="pct">0</span>%</span></div>
+
+          <div class="u setup glass float-b">
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg>Shot setup</h4>
+            <dl>
+              <dt>Where</dt><dd>At the quiet end of Wukang Rd, where the old houses line one side of the street.</dd>
+              <dt>Frame</dt><dd>Wide shot. The houses take up most of the screen. You start as a small figure far down the road.</dd>
+              <dt>Move</dt><dd>Prop the phone at chest height and keep it still. Walk toward it, say your line, then step out of frame on the right.</dd>
+            </dl>
+          </div>
+
+          <span class="matched" id="matched">14 of 19 shots matched</span>
+          <div class="u tray glass">
+            <span class="slot"><img src="assets/photos/collage.jpg" alt=""><span class="n">3</span></span>
+            <span class="slot"><img src="assets/photos/lake.jpg" alt=""><span class="n">4</span></span>
+            <span class="slot"><img src="assets/photos/food.jpg" alt=""><span class="n">5</span></span>
+            <span class="slot empty"><img src="assets/photos/houses.jpg" alt=""><span class="n">6</span></span>
+            <span class="slot empty"><img src="assets/photos/collage.jpg" alt="" style="object-position:50% 85%"><span class="n">7</span></span>
+            <span class="slot empty"><img src="assets/photos/lake.jpg" alt="" style="object-position:30% 80%"><span class="n">8</span></span>
+            <span class="pick" id="pick"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5c.5 3.9 1.9 6.2 5.6 7.4l1.9.6-1.9.6c-3.7 1.2-5.1 3.5-5.6 7.4-.5-3.9-1.9-6.2-5.6-7.4L4.5 10.5l1.9-.6C10.1 8.7 11.5 6.4 12 2.5Z"/></svg>Pick for me</span>
+            <span class="cut">AutoCut</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="needs" aria-labelledby="needs-title">
+    <div class="container">
+      <header class="sec-head">
+        <p class="sec-no">01 · 需求分析</p>
+        <h2 id="needs-title">视频创作路径上的四个断点</h2>
+        <p>普通用户想在 AI Lab 做出一条质量不错的视频，却在起步、素材准备、拍摄和成片之间遇到断点。</p>
+      </header>
+
+      <ol class="breaks reveal" id="breaks">
+        <li>
+          <div class="break-shot">
+            <div class="scr" style="--l:3%;--t:72%;--w:94%;--h:16%">
+              <img class="base" src="assets/current/01-ailab.jpg" width="720" height="1564" loading="lazy" alt="CapCut AI Lab 首页：自然语言输入框及图片、视频添加入口">
+              <img class="focus" src="assets/current/01-ailab.jpg" alt="" aria-hidden="true">
+              <span class="ring" style="transition-delay:.1s"></span>
+              <span class="tip" style="transition-delay:.2s">需先有素材或明确需求</span>
+            </div>
+          </div>
+          <div class="path"><span class="node">1</span></div>
+          <div class="break-copy">
+            <h3>起步门槛高</h3>
+            <p>模板需要素材，自然输入需要明确需求；想法模糊的用户仍不知如何开始。</p>
+          </div>
+        </li>
+        <li>
+          <div class="break-shot">
+            <div class="scr" style="--l:2%;--t:80%;--w:96%;--h:8.5%">
+              <img class="base" src="assets/current/02-template-upload.jpg" width="720" height="1564" loading="lazy" alt="模板上传页：按模板给出的片段时长逐个放入素材">
+              <img class="focus" src="assets/current/02-template-upload.jpg" alt="" aria-hidden="true">
+              <span class="ring" style="transition-delay:.45s"></span>
+              <span class="tip" style="transition-delay:.55s">相似素材缺少参考</span>
+            </div>
+          </div>
+          <div class="path"><span class="node">2</span></div>
+          <div class="break-copy">
+            <h3>素材要求不清</h3>
+            <p>要求上传相似素材，却没有具体参考，用户不清楚该准备什么。</p>
+          </div>
+        </li>
+        <li>
+          <div class="break-shot">
+            <div class="scr" style="--l:33%;--t:88.6%;--w:64%;--h:7%">
+              <img class="base" src="assets/current/03-template.jpg" width="720" height="1556" loading="lazy" alt="模板详情页：可预览成片并使用模板">
+              <img class="focus" src="assets/current/03-template.jpg" alt="" aria-hidden="true">
+              <span class="ring" style="transition-delay:.8s"></span>
+              <span class="tip" style="left:65%;transition-delay:.9s">有成片，没有拍摄拆解</span>
+            </div>
+          </div>
+          <div class="path"><span class="node">3</span></div>
+          <div class="break-copy">
+            <h3>缺少拍摄拆解</h3>
+            <p>能看到模板成片，却看不到镜头拍法和内容结构，用户仍不知如何拍出类似的视频。</p>
+          </div>
+        </li>
+        <li>
+          <div class="break-shot">
+            <div class="scr" style="--l:1%;--t:72%;--w:98%;--h:18%">
+              <img class="base" src="assets/current/04-autocut-result.jpg" width="720" height="1560" loading="lazy" alt="AutoCut 结果页：成片预览及 For You 风格选择">
+              <img class="focus" src="assets/current/04-autocut-result.jpg" alt="" aria-hidden="true">
+              <span class="ring" style="transition-delay:1.15s"></span>
+              <span class="tip" style="transition-delay:1.25s">缺少创作信息</span>
+            </div>
+          </div>
+          <div class="path"><span class="node">4</span></div>
+          <div class="break-copy">
+            <h3>成片质量不足</h3>
+            <p>AutoCut 未采集足够的创作信息，难以按用户意图组织素材，成片质量受限。</p>          </div>
+        </li>
+      </ol>
+      <p class="source">现状截图：CapCut iOS，来自 Mobbin</p>
+
+      <div class="verdict">
+        <span class="label">结论</span>
+        <p class="statement"><span>现有能力各自停在流程中的某一个节点，用户无法独立走完整条路径。</span>因此应由 AI 承担流程，用户只在关键节点做决策。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="research" aria-labelledby="research-title">
+    <div class="container">
+      <header class="sec-head">
+        <p class="sec-no">02 · 竞品调研</p>
+        <h2 id="research-title">普通人现在怎么用 AI 做一条视频</h2>
+        <p>调研多款 AI 视频创作产品后，将交互方式归纳为表单式、对话式和模板式，并从每类中选取代表产品展开分析。</p>
+      </header>
+
+      <div class="table-scroll">
+        <table class="matrix reveal">
+          <colgroup><col class="label-col"><col><col><col></colgroup>
+          <thead>
+            <tr>
+              <td></td>
+              <th scope="col">
+                <div class="break-shot">
+                  <div class="scr" style="--l:3%;--t:17%;--w:94%;--h:55%">
+                    <img class="base" src="assets/competitors/pika.png" width="1206" height="2622" loading="lazy" alt="Pika Video Studio：输入视频描述，添加画面或参考素材，设置时长、画幅、清晰度、声音及模型">
+                    <img class="focus" src="assets/competitors/pika.png" alt="" aria-hidden="true">
+                    <span class="ring" style="transition-delay:.1s"></span>
+                    <span class="tip" style="transition-delay:.2s">描述画面，设置生成参数</span>
+                  </div>
+                </div>
+                <span class="kind">表单式</span><span class="name">Pika</span><span class="maker">iOS · Video Studio</span>
+              </th>
+              <th scope="col">
+                <div class="break-shot">
+                  <div class="scr" style="--l:3%;--t:19%;--w:92%;--h:9.5%">
+                    <img class="base" src="assets/competitors/luma.jpg" width="640" height="1384" loading="lazy" alt="Luma Dream Machine 对话页：用一句话描述想要的画面">
+                    <img class="focus" src="assets/competitors/luma.jpg" alt="" aria-hidden="true">
+                    <span class="ring" style="transition-delay:.45s"></span>
+                    <span class="tip" style="transition-delay:.55s">用对话描述画面</span>
+                  </div>
+                </div>
+                <span class="kind">对话式</span><span class="name">Luma Dream Machine</span><span class="maker">iOS · 主打无需写提示词，直接提问</span>
+              </th>
+              <th scope="col">
+                <div class="break-shot">
+                  <div class="scr" style="--l:2%;--t:24.5%;--w:96%;--h:35.5%">
+                    <img class="base" src="assets/competitors/captions.jpg" width="446" height="983" loading="lazy" alt="Captions 新建视频页：导入 1 段素材后，在 AI Edit 里选一个风格模板">
+                    <img class="focus" src="assets/competitors/captions.jpg" alt="" aria-hidden="true">
+                    <span class="ring" style="transition-delay:.8s"></span>
+                    <span class="tip" style="transition-delay:.9s">选一个风格模板</span>
+                  </div>
+                </div>
+                <span class="kind">模板式</span><span class="name">Captions</span><span class="maker">iOS</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">服务对象</th><td>希望用文字或参考素材生成视频的创作者</td><td>艺术家、设计师、创作者和爱好者</td><td>本职不是剪视频的人</td></tr>
+            <tr><th scope="row">用户路径</th>
+              <td><ol class="flow"><li>描述想要的画面，按需添加画面或参考素材</li><li>设置模型、时长、画幅等生成参数</li><li>生成视频，查看结果</li></ol></td>
+              <td><ol class="flow"><li>在对话中描述想要的画面</li><li>生成</li><li>继续对话修改，结果归入 Boards</li></ol></td>
+              <td><ol class="flow"><li>进入 AI Edit，从相册选视频</li><li>选风格</li><li>AI 自动加剪辑点、B-roll、字幕和音乐</li></ol></td></tr>
+            <tr><th scope="row">AI 介入环节</th><td>生成画面<span class="state">用户提供描述与参数</span></td><td>构思<span class="state">想法还模糊</span></td><td>剪辑<span class="state">素材已拍好</span></td></tr>
+            <tr><th scope="row">用户决策</th><td>画面描述、参考素材与生成参数</td><td>对话里的每一句</td><td>选风格</td></tr>
+            <tr><th scope="row">长处</th><td>参考素材与生成参数集中设置，用户可以直接调整生成条件。</td><td>门槛低，表达自由。</td><td>直观，第一次使用就能拿到完整成片。</td></tr>
+            <tr><th scope="row">局限</th><td>用户仍需自行组织画面描述；这一生成流程未提供真实拍摄与素材整理的连续引导。</td><td>用户仍需主动描述需求；想法模糊时，不知从何输入。</td><td>当前分析的 AI Edit 路径需要先提供拍摄素材。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="source">截图来源：Pika 为用户提供的 App 截图；Luma、Captions 为 ScreensDesign。Pika 流程参考：<a href="https://creation.pika.art/apps/create-video" target="_blank" rel="noopener noreferrer">官方 Video Studio 说明</a>。</p>
+
+      <div class="verdict">
+        <div class="spectrum" aria-hidden="true">
+          <div class="end"><i></i><b>AI 把想法变成视频</b><small>Pika · Luma</small></div>
+          <div class="gap"><i>?</i><b>拍什么、怎么拍</b><small>普通用户仍不清楚</small></div>
+          <div class="end"><i></i><b>AI 剪辑已有素材</b><small>Captions</small></div>
+        </div>
+        <span class="label">结论</span>
+        <p class="statement"><span>表单、对话和模板各有长处，帮助用户把想法变成视频，或将已有素材剪成片。</span>但普通用户仍不清楚拍什么、怎么拍，以及如何完成整条创作流程。</p>
+      </div>
+    </div>
+  </section>
+  <section class="section" id="strategy" aria-labelledby="strategy-title">
+    <div class="container">
+      <header class="sec-head">
+        <p class="sec-no">03 · 设计目标与策略</p>
+        <h2 id="strategy-title">让普通人低门槛走通视频创作全流程</h2>
+        <p>面向缺少创作经验的普通用户，AI 主动获取信息、推进创作流程，用户只需在关键节点做决策。</p>
+      </header>
+
+      <div class="block">
+        <div class="goal-cards reveal">
+          <article class="goal">
+            <span class="goal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#goal-icon-gradient-1)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><defs><linearGradient id="goal-icon-gradient-1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:color-mix(in srgb,var(--accent) 70%,white)"/><stop offset="55%" style="stop-color:var(--accent)"/><stop offset="100%" style="stop-color:color-mix(in srgb,var(--accent) 60%,white)"/></linearGradient></defs><path pathLength="1" d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1Z"/><path pathLength="1" d="M16 5h2a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2"/><path pathLength="1" d="m8.5 12 2 2 4-4"/><path pathLength="1" d="M8.5 17h7"/></svg></span>
+            <h4>降低规划门槛</h4>
+            <p class="what">只有一个想法，也能逐步明确想拍什么，形成适合自己的创作方案。</p>
+            <p class="goal-context"><svg class="context-quote" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>用户不知道创作从哪里开始，也难以自行组织完整需求。</p>
+          </article>
+          <article class="goal">
+            <span class="goal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#goal-icon-gradient-2)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><defs><linearGradient id="goal-icon-gradient-2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:color-mix(in srgb,var(--accent) 70%,white)"/><stop offset="55%" style="stop-color:var(--accent)"/><stop offset="100%" style="stop-color:color-mix(in srgb,var(--accent) 60%,white)"/></linearGradient></defs><path pathLength="1" d="M4 5h8M8 3v2M5.5 5c.8 3 3 5.5 6 6.5M10.5 5c-.8 3-3.2 5.6-6.5 7"/><path pathLength="1" d="m12 20 4-9 4 9M13.4 17h5.2"/></svg></span>
+            <h4>降低理解门槛</h4>
+            <p class="what">无需掌握专业创作知识，也能看懂视频结构、预见成片效果，知道每个镜头该怎么拍。</p>
+            <p class="goal-context"><svg class="context-quote" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>专业创作信息难以理解，缺少可以直接跟随的拍摄参考。</p>
+          </article>
+          <article class="goal">
+            <span class="goal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#goal-icon-gradient-3)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><defs><linearGradient id="goal-icon-gradient-3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:color-mix(in srgb,var(--accent) 70%,white)"/><stop offset="55%" style="stop-color:var(--accent)"/><stop offset="100%" style="stop-color:color-mix(in srgb,var(--accent) 60%,white)"/></linearGradient></defs><path pathLength="1" d="M14.5 5h-5L8 7H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-3Z"/><circle pathLength="1" cx="12" cy="13" r="3.2"/></svg></span>
+            <h4>降低执行门槛</h4>
+            <p class="what">每一步都有清楚的下一步，让参考、拍摄、素材整理与剪辑连续衔接，逐步完成自己的视频。</p>
+            <p class="goal-context"><svg class="context-quote" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>参考、拍摄与素材整理彼此割裂，需要用户自行衔接。</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="strategy-stories">
+          <article class="strategy-story" aria-labelledby="strategy-one-title">
+            <div class="strategy-copy">
+              <p class="strategy-number">01 · 降低规划门槛</p>
+              <h4 id="strategy-one-title">结构化引导，<br>关键节点决策</h4>
+              <p>视频创作开始前，需要先明确一系列信息，但普通用户并不知道具体有哪些。因此，我把这些信息拆成类型、出行信息和拍摄设置三组选择，让用户逐步点选，AI 再据此开始规划。</p>
+            </div>
+            <div class="strategy-visual">
+              <div class="input-sheets">
+                <figure><a href="assets/strategy/input-type.jpg" target="_blank" rel="noopener noreferrer" aria-label="放大查看：类型弹窗：选择想拍的 vlog 类型"><img src="assets/strategy/input-type.jpg" width="333" height="259" loading="lazy" alt="类型弹窗：选择想拍的 vlog 类型"></a><figcaption>类型</figcaption></figure>
+                <figure><a href="assets/strategy/input-trip.jpg" target="_blank" rel="noopener noreferrer" aria-label="放大查看：出行信息弹窗：选择同行人、时段和地点类型"><img src="assets/strategy/input-trip.jpg" width="333" height="361" loading="lazy" alt="出行信息弹窗：选择同行人、时段和地点类型"></a><figcaption>出行信息</figcaption></figure>
+                <figure><a href="assets/strategy/input-shoot.jpg" target="_blank" rel="noopener noreferrer" aria-label="放大查看：拍摄设置弹窗：选择画幅、时长与出镜方式"><img src="assets/strategy/input-shoot.jpg" width="333" height="306" loading="lazy" alt="拍摄设置弹窗：选择画幅、时长与出镜方式"></a><figcaption>拍摄设置</figcaption></figure>
+              </div>
+              <p class="strategy-handoff"><span>用户提供关键信息</span><span class="flow-arrow" aria-hidden="true">→</span><strong>AI 组织创作方案</strong></p>
+            </div>
+          </article>
+
+          <article class="strategy-story" aria-labelledby="strategy-two-title">
+            <div class="strategy-copy">
+              <p class="strategy-number">02 · 降低理解门槛</p>
+              <h4 id="strategy-two-title">先看整体结构，<br>再了解每个镜头怎么拍</h4>
+              <p>用户难以在创作初期明确成片效果。信息过少无法判断拍摄内容，专业脚本又容易增加理解负担。将大纲确认与拍摄参考生成分成两步：大纲用段落卡片呈现结构，镜头细节按需展开；确认后再提供画面参考与具体拍法，让用户逐步明确预期，降低理解门槛。</p>
+            </div>
+            <div class="strategy-visual">
+              <div class="layer-comparison">
+                <figure><span class="layer-label">大纲 · 拍什么</span><a href="assets/strategy/outline.jpg" target="_blank" rel="noopener noreferrer" aria-label="放大查看：大纲以段落卡片呈现结构，镜头按需展开"><img src="assets/strategy/outline.jpg" width="333" height="479" loading="lazy" alt="大纲以段落卡片呈现结构，镜头按需展开"></a><figcaption>先确认内容结构</figcaption></figure>
+                <span class="flow-arrow" aria-hidden="true">→</span>
+                <figure><span class="layer-label">拍摄参考 · 怎么拍</span><a href="assets/strategy/reference.jpg" target="_blank" rel="noopener noreferrer" aria-label="放大查看：镜头参考将画面与 Where、Frame、Move 拍法放在一起"><img src="assets/strategy/reference.jpg" width="333" height="495" loading="lazy" alt="镜头参考将画面与 Where、Frame、Move 拍法放在一起"></a><figcaption>再理解具体拍法</figcaption></figure>
+              </div>
+            </div>
+          </article>
+
+          <article class="strategy-story" aria-labelledby="strategy-three-title">
+            <div class="strategy-copy">
+              <p class="strategy-number">03 · 降低执行门槛</p>
+              <h4 id="strategy-three-title">以镜头为单位，<br>统一拍摄与上传</h4>
+              <p>拍摄与素材整理相互割裂，用户需要额外将素材对应到镜头。将每个镜头同时作为拍摄参考和素材位置，让直接拍摄与相册上传汇入同一组镜头格，并通过 Pick for me 辅助匹配，减少切换与整理，让拍摄到剪辑连续衔接。</p>
+            </div>
+            <div class="strategy-visual">
+              <div class="route-branches">
+                <figure><span class="layer-label">跟着参考拍摄</span><a href="assets/strategy/camera.jpg" target="_blank" rel="noopener noreferrer" aria-label="放大查看：原生相机叠加参考样片和提词器"><img src="assets/strategy/camera.jpg" width="333" height="519" loading="lazy" alt="原生相机叠加参考样片和提词器"></a><figcaption>样片小窗 + 台词提示</figcaption></figure>
+                <figure><span class="layer-label">从相册添加</span><a href="assets/strategy/album.jpg" target="_blank" rel="noopener noreferrer" aria-label="放大查看：从相册选择已有拍摄素材"><img src="assets/strategy/album.jpg" width="333" height="510" loading="lazy" alt="从相册选择已有拍摄素材"></a><figcaption>Pick for me 自动归位</figcaption></figure>
+              </div>
+              <div class="route-merge" aria-hidden="true"></div>
+              <div class="shared-tray"><span class="layer-label">同一组镜头格</span><a href="assets/strategy/shot-tray.jpg" target="_blank" rel="noopener noreferrer" aria-label="放大查看：全片连续编号的镜头格，用于对应和整理素材"><img src="assets/strategy/shot-tray.jpg" width="333" height="78" loading="lazy" alt="全片连续编号的镜头格，用于对应和整理素材"></a><p>素材与镜头对应，进度同步</p></div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3 class="sub-head">AI 在流程各节点的介入<small>把整条流程看成一条时间轴：每个节点上 AI 做什么，解决了前面哪个断点或门槛</small></h3>
+        <div class="table-scroll">
+          <div class="tl reveal" aria-label="AI 在流程各节点的介入">
+            <div class="tl-label">流程节点</div><div class="tl-ruler"><span>01</span><b>创作策划</b></div><div class="tl-ruler"><span>02</span><b>脚本规划</b></div><div class="tl-ruler"><span>03</span><b>分镜设计</b></div><div class="tl-ruler"><span>04</span><b>拍摄执行</b></div><div class="tl-ruler"><span>05</span><b>素材整理</b></div><div class="tl-ruler"><span>06</span><b>后期剪辑</b></div>
+            <div class="tl-label">AI 做什么</div><div class="clip-ai">主动提问</div><div class="clip-ai">生成段落与镜头</div><div class="clip-ai">白话拍法 + 样片</div><div class="clip-ai">样片小窗 + 提词器</div><div class="clip-ai">Pick for me 自动归位</div><div class="clip-ai">按大纲剪辑，补空镜</div>
+            <div class="tl-label">解决什么</div><div class="clip-fix">不知道拍什么<span class="tag">规划门槛</span></div><div class="clip-fix">不知道片子由什么组成<span class="tag">理解门槛</span></div><div class="clip-fix">不会跟拍<span class="tag">理解门槛</span></div><div class="clip-fix">看参考、记台词与拍摄来回切换<span class="tag">执行门槛</span></div><div class="clip-fix">素材对不上镜头<span class="tag">执行门槛</span></div><div class="clip-fix">成片质量不足<span class="tag">执行门槛</span></div>
+            <span class="playhead" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="prototype-cta">
+    <a class="btn btn-primary" href="../index.html">进入交互原型<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-7-7 7 7-7 7"/></svg></a>
+  </div>
+</main>
+
+<script>
+// One quiet loop: AI writes the outline, then Pick for me fills the empty shot slots.
+(function(){
+  const pct=document.getElementById('pct'),gen=document.getElementById('gen'),label=document.getElementById('gen-label');
+  const pick=document.getElementById('pick'),matched=document.getElementById('matched');
+  const empties=[...document.querySelectorAll('.slot.empty')];
+  const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const outlineText=()=>'Writing your outline · <span class="pct" id="pct">0</span>%';
+  function finalState(){gen.classList.add('done');label.textContent='Outline ready';empties.forEach(s=>s.classList.add('filled'));matched.classList.add('show');}
+  if(still){finalState();return;}
+  let timers=[];
+  function cycle(){
+    timers.forEach(clearTimeout);timers=[];
+    gen.classList.remove('done');label.innerHTML=outlineText();
+    empties.forEach(s=>s.classList.remove('filled'));matched.classList.remove('show');pick.classList.remove('run');
+    const p=document.getElementById('pct'),t0=performance.now(),dur=2600;
+    (function tick(now){const k=Math.min(1,(now-t0)/dur);p.textContent=Math.round(k*100);if(k<1)requestAnimationFrame(tick);else{gen.classList.add('done');label.textContent='Outline ready';}})(t0);
+    timers.push(setTimeout(()=>{void pick.offsetWidth;pick.classList.add('run');},3400));
+    empties.forEach((s,i)=>timers.push(setTimeout(()=>s.classList.add('filled'),4100+i*380)));
+    timers.push(setTimeout(()=>matched.classList.add('show'),4100+empties.length*380+150));
+    timers.push(setTimeout(cycle,9000));
+  }
+  cycle();
+})();
+
+// Spotlight groups light up in order once they scroll into view.
+(function(){
+  const groups=[...document.querySelectorAll('.reveal')];
+  if(!('IntersectionObserver' in window)){groups.forEach(g=>g.classList.add('is-in'));return;}
+  const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target);}});},{threshold:.3});
+  groups.forEach(g=>io.observe(g));
+})();
+</script>
+</body>
+</html>
